@@ -4,8 +4,9 @@ from utils import get_reading_level
 
 lines = []
 
-with open('single_cconj.txt') as f:
+with open('data/single_cconj.txt') as f:
     for line in f.readlines():
+        line = line.split(":::")[1]
         lines.append(line.strip('\n'))
 
 from collections import defaultdict

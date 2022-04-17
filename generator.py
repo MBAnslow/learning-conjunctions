@@ -9,7 +9,7 @@ generator = pipeline(task="text-generation", model=model, tokenizer=tokenizer)
 
 lines = []
 
-with open('single_cconj.txt') as f:
+with open('data/single_cconj.txt') as f:
     for line in f.readlines():
         lines.append(line.strip('\n'))
 
