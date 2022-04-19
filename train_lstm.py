@@ -27,7 +27,7 @@ class MyDataset(torch.utils.data.Dataset):
     def load_sentences(self):
         with open("data/single_cconj.txt") as f:
 
-            lines = f.readlines()[:100]
+            lines = f.readlines()
             lines = [line.split(":::")[1].lower().strip('\n') for line in lines]
             lines = [line for line in lines if get_reading_level(line) in {"very_easy", "easy", "fairly_easy"}]
 
