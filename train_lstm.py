@@ -27,7 +27,7 @@ class MyDataset(torch.utils.data.Dataset):
     def load_sentences(self):
         with open("data/single_cconj.txt") as f:
 
-            lines = f.readlines()
+            lines = f.readlines()[:100]
             lines = [line.split(":::")[1].lower().strip('\n') for line in lines]
             lines = [line for line in lines if get_reading_level(line) in {"very_easy", "easy", "fairly_easy"}]
 
@@ -52,9 +52,10 @@ class MyDataset(torch.utils.data.Dataset):
         return (input, output)
 
 
-class TextGenerator(nn.ModuleList):
+class TextGenerator(nn.Module):
     def __init__(self, args, vocab_size):
         super(TextGenerator, self).__init__()
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         self.batch_size = args.batch_size
         self.hidden_dim = args.hidden_dim
@@ -64,14 +65,14 @@ class TextGenerator(nn.ModuleList):
         self.sequence_len = args.window
 
         # Dropout
-        self.dropout = nn.Dropout(0.25)
+        self.dropout = nn.Dropout(0.25).to(device)
 
         # Embedding layer
-        self.embedding = nn.Embedding(self.input_size, self.hidden_dim, padding_idx=0)
+        self.embedding = nn.Embedding(self.input_size, self.hidden_dim, padding_idx=0).to(device)
 
         self.lstm = nn.LSTM(input_size=self.hidden_dim, hidden_size=self.hidden_dim,
-                            num_layers=self.num_layers, batch_first=True, dropout=0.2)  # lstm
-        self.fc = nn.Linear(self.hidden_dim, vocab_size)
+                            num_layers=self.num_layers, batch_first=True, dropout=0.2).to(device)  # lstm
+        self.fc = nn.Linear(self.hidden_dim, vocab_size).to(device)
 
     def forward(self, x, prev_state):
         embed = self.embedding(x)
@@ -188,7 +189,7 @@ class Execution:
 
                 x.to(device)
                 y.to(device)
-
+                print(x.get_device(), y.get_device(), state_h.get_device(), state_c.get_device())
                 y_pred, (state_h, state_c) = model(x, (state_h, state_c))
                 loss = criterion(y_pred.transpose(1, 2), y)
 
