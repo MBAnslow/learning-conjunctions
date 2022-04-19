@@ -160,6 +160,9 @@ class Execution:
 
         # Criterion
         criterion = nn.CrossEntropyLoss()
+
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
         # Model initialization
         model = TextGenerator(args, len(dataset.uniq_words))
         # Optimizer initialization
@@ -167,10 +170,13 @@ class Execution:
         # Set model in training mode
         model.train()
 
+        model.to(device)
+
         # Training pahse
         for epoch in range(self.num_epochs):
             state_h, state_c = model.init_state(args.batch_size)
-
+            state_h.to(device)
+            state_c.to(device)
             # Mini batches
             for batch, (x, y) in enumerate(dataloader):
                 # Clean gradients
@@ -179,6 +185,9 @@ class Execution:
                     print(batch/len(dataloader))
 
                 optimizer.zero_grad()
+
+                x.to(device)
+                y.to(device)
 
                 y_pred, (state_h, state_c) = model(x, (state_h, state_c))
                 loss = criterion(y_pred.transpose(1, 2), y)
