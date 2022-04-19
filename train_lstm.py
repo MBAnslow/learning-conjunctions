@@ -176,8 +176,8 @@ class Execution:
         # Training pahse
         for epoch in range(self.num_epochs):
             state_h, state_c = model.init_state(args.batch_size)
-            state_h.to(device)
-            state_c.to(device)
+            state_h = state_h.to(device)
+            state_c = state_c.to(device)
             # Mini batches
             for batch, (x, y) in enumerate(dataloader):
                 # Clean gradients
@@ -187,8 +187,8 @@ class Execution:
 
                 optimizer.zero_grad()
 
-                x.to(device)
-                y.to(device)
+                x = x.to(device)
+                y = y.to(device)
                 print(x.get_device(), y.get_device(), state_h.get_device(), state_c.get_device())
                 y_pred, (state_h, state_c) = model(x, (state_h, state_c))
                 loss = criterion(y_pred.transpose(1, 2), y)
