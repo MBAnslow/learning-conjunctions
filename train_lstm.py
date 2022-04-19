@@ -64,14 +64,11 @@ class TextGenerator(nn.Module):
         self.num_classes = vocab_size
         self.sequence_len = args.window
 
-        # Dropout
-        self.dropout = nn.Dropout(0.25).to(device)
-
         # Embedding layer
         self.embedding = nn.Embedding(self.input_size, self.hidden_dim, padding_idx=0).to(device)
 
         self.lstm = nn.LSTM(input_size=self.hidden_dim, hidden_size=self.hidden_dim,
-                            num_layers=self.num_layers, batch_first=True, dropout=0.2).to(device)  # lstm
+                            num_layers=self.num_layers, batch_first=True, dropout=0.6).to(device)  # lstm
         self.fc = nn.Linear(self.hidden_dim, vocab_size).to(device)
 
     def forward(self, x, prev_state):
@@ -91,15 +88,15 @@ import argparse
 def parameter_parser():
     parser = argparse.ArgumentParser(description="Text Generation")
 
-    parser.add_argument("--epochs", dest="num_epochs", type=int, default=100)
+    parser.add_argument("--epochs", dest="num_epochs", type=int, default=1000)
     parser.add_argument("--learning_rate", dest="learning_rate", type=float, default=0.001)
-    parser.add_argument("--hidden_dim", dest="hidden_dim", type=int, default=128)
-    parser.add_argument("--embedding_dim", dest="embedding_dim", type=int, default=150)
-    parser.add_argument("--batch_size", dest="batch_size", type=int, default=16)
-    parser.add_argument("--window", dest="window", type=int, default=10)
+    parser.add_argument("--hidden_dim", dest="hidden_dim", type=int, default=256)
+    parser.add_argument("--embedding_dim", dest="embedding_dim", type=int, default=256)
+    parser.add_argument("--batch_size", dest="batch_size", type=int, default=64)
+    parser.add_argument("--window", dest="window", type=int, default=20)
     parser.add_argument("--load_model", dest="load_model", type=bool, default=False)
     parser.add_argument("--model", dest="model", type=str, default='weights/textGenerator.pt')
-    parser.add_argument("--num_layers", dest="num_layers", type=int, default=2)
+    parser.add_argument("--num_layers", dest="num_layers", type=int, default=3)
 
     return parser.parse_args()
 
