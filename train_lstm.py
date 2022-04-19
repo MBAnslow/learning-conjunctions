@@ -18,7 +18,7 @@ class MyDataset(torch.utils.data.Dataset):
         self.sentences = self.load_sentences()
         print('getting unique words')
         self.uniq_words = self.get_uniq_words()
-        self.uniq_words.append('UKNOWN')
+        self.uniq_words = ['PADDING', 'UKNOWN'] + self.uniq_words
         print("Num words: ", len(self.uniq_words))
         self.window = args.window
         self.index_to_word = {index: word for index, word in enumerate(self.uniq_words)}
@@ -32,10 +32,10 @@ class MyDataset(torch.utils.data.Dataset):
             lines = [line for line in lines if get_reading_level(line) in {"very_easy", "easy", "fairly_easy"}]
 
         return [" ".join([tok.orth_ for tok in nlp(line)]) for line in lines]
-    
+
     def get_uniq_words(self):
         word_counts = Counter(" ".join(self.sentences).split(" "))
-        return sorted({word: count for word, count in word_counts.items() if word_counts[word] > 5}, key=word_counts.get, reverse=True)
+        return sorted({word: count for word, count in word_counts.items() if word_counts[word] > 4}, key=word_counts.get, reverse=True)
 
     def __len__(self):
         return len(self.sentences)
@@ -91,10 +91,11 @@ def parameter_parser():
     parser = argparse.ArgumentParser(description="Text Generation")
 
     parser.add_argument("--epochs", dest="num_epochs", type=int, default=100)
-    parser.add_argument("--learning_rate", dest="learning_rate", type=float, default=0.01)
+    parser.add_argument("--learning_rate", dest="learning_rate", type=float, default=0.001)
     parser.add_argument("--hidden_dim", dest="hidden_dim", type=int, default=128)
+    parser.add_argument("--embedding_dim", dest="embedding_dim", type=int, default=150)
     parser.add_argument("--batch_size", dest="batch_size", type=int, default=16)
-    parser.add_argument("--window", dest="window", type=int, default=12)
+    parser.add_argument("--window", dest="window", type=int, default=10)
     parser.add_argument("--load_model", dest="load_model", type=bool, default=False)
     parser.add_argument("--model", dest="model", type=str, default='weights/textGenerator.pt')
     parser.add_argument("--num_layers", dest="num_layers", type=int, default=2)
@@ -190,9 +191,9 @@ class Execution:
 
             print(f"Epoch: {epoch},  loss: {loss.item()} ")
             print(" ".join(predict(dataset, model, text='a')))
-            print(" ".join(predict(dataset, model, text='b')))
-            print(" ".join(predict(dataset, model, text='c')))
-            print(" ".join(predict(dataset, model, text='d')))
+            print(" ".join(predict(dataset, model, text='i')))
+            print(" ".join(predict(dataset, model, text='the')))
+            print(" ".join(predict(dataset, model, text='and')))
 
             torch.save(model.state_dict(), f'weights/textGenerator_model_{epoch}.pt')
 
