@@ -119,11 +119,16 @@ from torch.utils.data import DataLoader
 def predict(dataset, model, text, next_words=100):
     model.eval()
 
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
     words = text.split(' ')
     state_h, state_c = model.init_state(len(words))
+    state_h = state_h.to(device)
+    state_c = state_c.to(device)
 
     for i in range(0, next_words):
         x = torch.tensor([[dataset.word_to_index[w] for w in words[i:]]])
+        x = x.to(device)
         y_pred, (state_h, state_c) = model(x, (state_h, state_c))
 
         last_word_logits = y_pred[0][-1]
@@ -189,7 +194,6 @@ class Execution:
 
                 x = x.to(device)
                 y = y.to(device)
-                print(x.get_device(), y.get_device(), state_h.get_device(), state_c.get_device())
                 y_pred, (state_h, state_c) = model(x, (state_h, state_c))
                 loss = criterion(y_pred.transpose(1, 2), y)
 
