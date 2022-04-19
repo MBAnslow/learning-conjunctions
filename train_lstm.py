@@ -174,12 +174,12 @@ class Execution:
         # Optimizer initialization
         optimizer = optim.RMSprop(model.parameters(), lr=self.learning_rate)
         # Set model in training mode
-        model.train()
 
         model.to(device)
 
         # Training pahse
         for epoch in range(self.num_epochs):
+            model.train()
             state_h, state_c = model.init_state(args.batch_size)
             state_h = state_h.to(device)
             state_c = state_c.to(device)
