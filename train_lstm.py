@@ -274,7 +274,7 @@ if __name__ == '__main__':
             model = TextGenerator(args, len(dataset.uniq_words))
             # Load weights
             model.load_state_dict(torch.load('weights/textGenerator_model_1.pt'))
-            
+
             print(" ".join(predict(dataset, model, text='a')))
             print(" ".join(predict(dataset, model, text='i')))
             print(" ".join(predict(dataset, model, text='the')))
