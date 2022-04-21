@@ -94,8 +94,8 @@ def parameter_parser():
     parser.add_argument("--embedding_dim", dest="embedding_dim", type=int, default=256)
     parser.add_argument("--batch_size", dest="batch_size", type=int, default=64)
     parser.add_argument("--window", dest="window", type=int, default=20)
-    parser.add_argument("--load_model", dest="load_model", type=bool, default=False)
-    parser.add_argument("--model", dest="model", type=str, default='weights/textGenerator.pt')
+    parser.add_argument("--load_model", dest="load_model", type=bool, default=True)
+    parser.add_argument("--model", dest="model", type=str, default='weights/textGenerator_model_10.pt')
     parser.add_argument("--num_layers", dest="num_layers", type=int, default=3)
 
     return parser.parse_args()
@@ -268,20 +268,17 @@ if __name__ == '__main__':
     # If you already have the trained weights
     if args.load_model == True:
         if os.path.exists(args.model):
-            # Load and prepare sequences
-            execution = Execution(args)
-            execution.prepare_data()
-            sequences = execution.sequences
-            idx_to_char = execution.idx_to_char
-            vocab_size = execution.vocab_size
+            dataset = MyDataset(args)
 
             # Initialize the model
-            model = TextGenerator(args, vocab_size)
+            model = TextGenerator(args, len(dataset.uniq_words))
             # Load weights
-            model.load_state_dict(torch.load('weights/textGenerator_model.pt'))
-
-            # Text generator
-            execution.generator(model, sequences, idx_to_char, 1000)
+            model.load_state_dict(torch.load('weights/textGenerator_model_1.pt'))
+            
+            print(" ".join(predict(dataset, model, text='a')))
+            print(" ".join(predict(dataset, model, text='i')))
+            print(" ".join(predict(dataset, model, text='the')))
+            print(" ".join(predict(dataset, model, text='and')))
 
     # If you will train the model
     else:
